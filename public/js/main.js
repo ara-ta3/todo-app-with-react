@@ -1,8 +1,9 @@
 (function() {
     "use strict";
-    var TodoList = React.createClass({
-        render: function() {
-            var todos = this.props.todos.map((todo, idx) => {
+
+    class TodoList extends React.Component {
+        render() {
+            const todos = this.props.todos.map((todo, idx) => {
                 return (
                         <Todo key={idx + "-" + Date.now()} text={todo} />
                        )
@@ -14,12 +15,13 @@
                     </div>
                    );
         }
-    });
-    var Todo = React.createClass({
-        handleTodo: function() {
-            var checked = ReactDOM.findDOMNode(this.refs.checkbox).checked;
+    }
+    class Todo extends React.Component {
+        handleTodo() {
+            const checked = ReactDOM.findDOMNode(this.refs.checkbox).checked;
+            const textForm = ReactDOM.findDOMNode(this.refs.text);
+
             ReactDOM.findDOMNode(this.refs.checkbox).checked = !checked;
-            var textForm = ReactDOM.findDOMNode(this.refs.text);
             if(checked) {
                 textForm.className = "text-primary";
                 textForm.style.textDecoration = "";
@@ -27,28 +29,30 @@
                 textForm.className = "text-muted";
                 textForm.style.textDecoration = "line-through";
             }
-        },
-        render: function() {
+        }
+        render() {
             return (
                     <div className="todo">
                     <label>
                     <input ref="checkbox" type="checkbox" className="todoCheckbox" />
                     </label>
-                    <span ref="text" className="text-primary" onClick={this.handleTodo}>  {this.props.text}  </span>
+                    <span ref="text" className="text-primary" onClick={this.handleTodo.bind(this)}>  {this.props.text}  </span>
                     </div>
                    );
         }
-    });
+    }
 
-    var TodoForm = React.createClass({
-        handleSubmit: function(e) {
+    class TodoForm extends React.Component {
+        handleSubmit(e) {
             e.preventDefault();
-            ReactDOM.findDOMNode(this.refs.text).value.trim() && this.props.onTodoSubmit(text);
+
+            const text = ReactDOM.findDOMNode(this.refs.text).value.trim();
+            text && this.props.onTodoSubmit(text);
             ReactDOM.findDOMNode(this.refs.text).value = "";
-        },
-        render: function() {
+        }
+        render() {
             return (
-                    <form className="todoForm" onSubmit={this.handleSubmit}>
+                    <form className="todoForm" onSubmit={this.handleSubmit.bind(this)}>
                     <div className="form-group">
                     <input type="text" className="form-control" placeholder="Todo content" ref="text"/>
                     </div>
@@ -56,29 +60,35 @@
                     </form>
                    );
         }
-    });
+    }
 
-    var TodoApp = React.createClass({
-        getInitialState: function() {
-            return {todos: []};
-        },
-        componentDidMount: function() {
+    class TodoApp extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                todos: []
+            }
+        }
+
+        componentDidMount() {
             this.setState({todos: ["ReactでTodoAppを作ってみる"]});
-        },
-        onTodoSubmit: function(todo) {
+        }
+
+        onTodoSubmit(todo) {
             this.setState({todos: this.state.todos.concat([todo])});
-        },
-        render: function() {
+        }
+
+        render() {
             return (
                     <div>
                     <h1>Todo App</h1>
                     <TodoList todos={this.state.todos}/>
                     <hr />
-                    <TodoForm onTodoSubmit={this.onTodoSubmit}/>
+                    <TodoForm onTodoSubmit={this.onTodoSubmit.bind(this)}/>
                     </div>
                    );
         }
-    });
+    }
 
     ReactDOM.render(
             <TodoApp />,
