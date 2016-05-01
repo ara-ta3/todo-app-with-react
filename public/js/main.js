@@ -43,11 +43,8 @@
     var TodoForm = React.createClass({
         handleSubmit: function(e) {
             e.preventDefault();
-            var text = ReactDOM.findDOMNode(this.refs.text).value.trim();
-            if(text) {
-                this.props.onTodoSubmit(text);
-                ReactDOM.findDOMNode(this.refs.text).value = "";
-            }
+            ReactDOM.findDOMNode(this.refs.text).value.trim() && this.props.onTodoSubmit(text);
+            ReactDOM.findDOMNode(this.refs.text).value = "";
         },
         render: function() {
             return (
@@ -66,7 +63,7 @@
             return {todos: []};
         },
         componentDidMount: function() {
-            this.setState({todos: ["hogehoge"]});
+            this.setState({todos: ["ReactでTodoAppを作ってみる"]});
         },
         onTodoSubmit: function(todo) {
             this.setState({todos: this.state.todos.concat([todo])});
