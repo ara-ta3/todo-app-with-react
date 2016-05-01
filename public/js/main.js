@@ -75,7 +75,8 @@
         }
 
         onTodoSubmit(todo) {
-            this.setState({todos: this.state.todos.concat([todo])});
+            this.props.todoActions.addTodo(todo)
+            this.setState({todos: this.state.todos.concat(this.props.todos.map((t) => t.todo))});
         }
 
         render() {
@@ -90,8 +91,61 @@
         }
     }
 
+    const initialState = {
+        todoList: [],
+        id: 0,
+        didCount: 0,
+    };
+    const ADD_TODO ='ADD_TODO';
+    function todoReduce(state = initialState, action) {
+        const todoList = [].concat(state.todoList);
+        const actionId = action.id;
+
+        switch (action.type) {
+            case ADD_TODO:
+                const todo = action.todo;
+                const stateId = state.id + 1;
+                todoList.push({stateId, todo, did: false});
+                return Object.assign({}, state, {
+                    todoList,
+                    id: stateId,
+                });
+            default:
+                return state;
+        }
+    }
+    function addTodoAction(content) {
+        return {
+            type: ADD_TODO,
+            todo: content,
+        };
+    }
+    const rootReducer = Redux.combineReducers({
+        todoReduce
+    })
+    function createFinalStore() {
+        const finalCreateStore = Redux.compose()(Redux.createStore);
+        return finalCreateStore(rootReducer);
+    }
+    const store = createFinalStore();
+    const Provider = ReactRedux.Provider;
+    function mapStateToProps(state) {
+        return {
+            todos: state.todoReduce.todoList,
+        };
+    }
+
+    function mapDispatchToProps(dispatch) {
+        return {
+            todoActions: Redux.bindActionCreators({addTodo: addTodoAction}, dispatch),
+        };
+    }
+    const ConnectedTodoApp = ReactRedux.connect(mapStateToProps, mapDispatchToProps)(TodoApp);
+
     ReactDOM.render(
-            <TodoApp />,
+            <Provider store={store}>
+                <ConnectedTodoApp />
+            </Provider>,
             document.getElementById("content")
             );
 })()
